@@ -60,6 +60,47 @@ await authenticatedSupabase.auth.setSession({
   }
 });
 
+app.post("/signup", async (req, res) => {
+  console.log(req.body);
+  const { email, password } = req.body;
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  return res.json({
+    message: "User created successfully",
+    user: data.user,
+  });
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const { data, error } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+  if (error) {
+    return res.status(401).json({
+      error: error.message,
+    });
+  }
+
+  return res.json({
+    message: "Login successful",
+    session: data.session,
+    user: data.user,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
